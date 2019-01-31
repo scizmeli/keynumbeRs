@@ -16,9 +16,7 @@ kn.getCollection <- function(coll, size=25, page=1) {
   else
     stop(paste('argument "coll" is missing, with no default'))
 
-  kn_key <- Sys.getenv("kn_key")
-  if (nchar(kn_key)==0)
-    stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
+  kn_key <- kn.getkey()
 
   print(paste("GET", url))
   res <- httr::GET(url, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
@@ -45,9 +43,7 @@ kn.getModel <- function(modelname) {
   else
     stop(paste('argument "modelname" is missing, with no default'))
 
-  kn_key <- Sys.getenv("kn_key")
-  if (nchar(kn_key)==0)
-    stop("Could not retreive the Keynumbers API key. Please set it.")
+  kn_key <- kn.getkey()
 
   print(paste("GET", url))
 
@@ -126,4 +122,24 @@ kn.modelRep <- function(model, segment_no) {
     Models[[x]]$data$segments[[segment_no]]$dividend$date = collection$keynumbers$dividends[[x]]$date
   }
   Models
+}
+
+kn.getkey <- function(){
+  kn_key <- NULL
+
+  kn_keyfile <- getOption("kn_keyfile")
+
+  if (is.null(kn_keyfile))
+    stop('Options "kn_keyfile" undefined. Please define it using : options(kn_keyfile = "name_of_key_file")')
+
+  if (!file.exists(kn_keyfile))
+    stop(paste("File", kn_keyfile, "does not exist. Please create it and put inside your Keynumbers API key.
+               The file should be a one-line file ending with \n"))
+
+  kn_key <- readLines(kn_keyfile)
+
+  if (is.null(kn_key) | nchar(kn_key)==0)
+    stop('\nKeynumbers API key should be set in a text file. The name of the file should be set as an option using options(kn_keyfile = "name_of_key_file")')
+
+  kn_key
 }
