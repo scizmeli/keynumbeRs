@@ -8,7 +8,7 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-url = "http://keynumbers.com/api/"
+url = "http://keynumbers.com/api/apiv1/"
 
 kn.getCollection <- function(coll, size=25, page=1) {
   if (exists("coll"))
@@ -18,20 +18,26 @@ kn.getCollection <- function(coll, size=25, page=1) {
 
   kn_key <- kn.getkey()
 
+  if(is.character(kn_key) & nchar(kn_key)==124)
+    url <- paste0(url, "&api_key=", kn_key)
+  else
+    stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
+
   print(paste("GET", url))
-  res <- httr::GET(url, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
+  res <- httr::GET(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
 
   if (res$status_code == 200)
     result <- content(res)
   else
-    stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
+    stop(paste0("Could not retreive Collection : ", coll, ". Status code : ", res$status_code, ", Message: ", content(res)$message))
 
-  for (I in 1:length(result$keynumbers$dividends)) {
-    result$keynumbers$dividends[[I]]$date <- as.POSIXct(result$keynumbers$dividends[[I]]$date)
+  for (J in 1:length(result)) {
+    for (I in 1:length(result[[J]]$keynumbers$dividends)) {
+      result[[J]]$keynumbers$dividends[[I]]$date <- as.POSIXct(result[[J]]$keynumbers$dividends[[I]]$date)
+    }
   }
-
-  for (I in 1:length(result$dates))
-    result$dates[[I]]$date = as.POSIXct(result$dates[[I]]$date)
+  for (I in 1:length(result[[J]]$dates))
+    result[[J]]$dates[[I]]$date = as.POSIXct(result[[J]]$dates[[I]]$date)
 
   result
 }
@@ -45,14 +51,19 @@ kn.getModel <- function(modelname) {
 
   kn_key <- kn.getkey()
 
+  if(is.character(kn_key) & nchar(kn_key)==124)
+    url <- paste0(url, "&api_key=", kn_key)
+  else
+    stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
+
   print(paste("GET", url))
 
-  res <- httr::GET(url, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
+  res <- httr::GET(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
 
   if (res$status_code == 200)
     result <- content(res)
   else
-    stop(paste("Status code:", res$status_code), ", Message: ", content(res)$message)
+    stop(paste("Could not retreive Collection :", "Status code:", res$status_code, ", Message: ", content(res)$message))
 
   for (I in 1:length(result$data$segments)){
     result$data$segments[[I]]$dividend$number <- as.numeric(result$data$segments[[I]]$dividend$number)
