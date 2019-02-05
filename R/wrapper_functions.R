@@ -19,7 +19,7 @@ kn.getCollection <- function(coll, size=25, page=1) {
   kn_key <- kn.getkey()
 
   if(is.character(kn_key) & nchar(kn_key)==124) {
-    print(paste("GET", url))
+    print(paste0("GET ", url, "&api_key=..."))
     url <- paste0(url, "&api_key=", kn_key)
   }
   else {
@@ -54,7 +54,7 @@ kn.getModel <- function(modelname) {
   kn_key <- kn.getkey()
 
   if(is.character(kn_key) & nchar(kn_key)==124) {
-    print(paste("GET", url))
+    print(paste0("GET ", url, "&api_key=..."))
     url <- paste0(url, "&api_key=", kn_key)
   }
   else {
