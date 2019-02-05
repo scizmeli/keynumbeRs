@@ -18,12 +18,14 @@ kn.getCollection <- function(coll, size=25, page=1) {
 
   kn_key <- kn.getkey()
 
-  if(is.character(kn_key) & nchar(kn_key)==124)
+  if(is.character(kn_key) & nchar(kn_key)==124) {
+    print(paste("GET", url))
     url <- paste0(url, "&api_key=", kn_key)
-  else
+  }
+  else {
     stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
+  }
 
-  print(paste("GET", url))
   res <- httr::GET(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
 
   if (res$status_code == 200)
@@ -51,12 +53,13 @@ kn.getModel <- function(modelname) {
 
   kn_key <- kn.getkey()
 
-  if(is.character(kn_key) & nchar(kn_key)==124)
+  if(is.character(kn_key) & nchar(kn_key)==124) {
+    print(paste("GET", url))
     url <- paste0(url, "&api_key=", kn_key)
-  else
+  }
+  else {
     stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
-
-  print(paste("GET", url))
+  }
 
   res <- httr::GET(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
 
