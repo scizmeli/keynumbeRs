@@ -8,7 +8,7 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-url = "http://keynumbers.com/api/apiv1/"
+url = "https://keynumbers.com/api/apiv1/"
 
 kn.getCollection <- function(coll, size=25, page=1) {
   if (exists("coll"))
@@ -54,27 +54,28 @@ kn.getModel <- function(modelname) {
   kn_key <- kn.getkey()
 
   if(is.character(kn_key) & nchar(kn_key)==124) {
-    print(paste0("GET ", url, "&api_key=..."))
-    url <- paste0(url, "&api_key=", kn_key)
+    print(paste0("POST ", url, "&api_key=..."))
+    url <- paste0(url, "?api_key=", kn_key)
   }
   else {
     stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
   }
 
-  res <- httr::GET(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
+  res <- httr::POST(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
 
   if (res$status_code == 200)
     result <- content(res)
   else
-    stop(paste("Could not retreive Collection :", "Status code:", res$status_code, ", Message: ", content(res)$message))
+    stop(paste("Could not retreive model :", modelname, "Status code:", res$status_code, ", Message: ", content(res)$message))
 
-  for (I in 1:length(result$data$segments)){
-    result$data$segments[[I]]$dividend$number <- as.numeric(result$data$segments[[I]]$dividend$number)
-    result$data$segments[[I]]$divisor$number <- as.numeric(result$data$segments[[I]]$divisor$number)
-    result$data$segments[[I]]$dividend$date <- as.POSIXct(result$data$segments[[I]]$dividend$date)
-    result$data$segments[[I]]$dividend$decimal_points <- as.numeric(result$data$segments[[I]]$dividend$decimal_points)
-    result$data$segments[[I]]$dividend$min <- as.numeric(result$data$segments[[I]]$dividend$min)
-    result$data$segments[[I]]$dividend$max <- as.numeric(result$data$segments[[I]]$dividend$max)
+  for (I in 1:length(result$model$segments)){
+    result$model$segments[[I]]$dividend$number <- as.numeric(result$model$segments[[I]]$dividend$number)
+    result$model$segments[[I]]$divisor$number <- as.numeric(result$model$segments[[I]]$divisor$number)
+
+    result$model$segments[[I]]$dividend$date <- as.POSIXct(result$model$segments[[I]]$dividend$date)
+    result$model$segments[[I]]$dividend$decimal_points <- as.numeric(result$model$segments[[I]]$dividend$decimal_points)
+    result$model$segments[[I]]$dividend$min <- as.numeric(result$model$segments[[I]]$dividend$min)
+    result$model$segments[[I]]$dividend$max <- as.numeric(result$model$segments[[I]]$dividend$max)
   }
 
   result
