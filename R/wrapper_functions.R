@@ -45,7 +45,7 @@ kn.getCollection <- function(coll, size=25, page=1) {
 }
 #a<-kn.getCollection(coll="sydney-water-consumption-3023")
 
-kn.getModel <- function(modelname) {
+kn.getModel <- function(modelname, body = NULL) {
   if (exists("modelname"))
     url <- paste0(url, "model/", modelname)
   else
@@ -61,7 +61,7 @@ kn.getModel <- function(modelname) {
     stop("Could not retreive Keynumbers API key. Please set it in ~/.Renviron and restart R.")
   }
 
-  res <- httr::POST(url) #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
+  res <- httr::POST(url, body = body, encode="json") #, httr::add_headers(Authorization = paste("Bearer", kn_key, sep = " ")))
 
   if (res$status_code == 200)
     result <- content(res)
@@ -83,7 +83,7 @@ kn.getModel <- function(modelname) {
 #a<-kn.getModel(model="sydney-water-usuage-1879")
 
 #Returns a numerical value
-kn.modelExec <- function(model) {
+kn.modelExecLocal <- function(model) {
   formula = model$data$formula
 
   #Append '1' into variable names stored in the formula
@@ -101,13 +101,30 @@ kn.modelExec <- function(model) {
   eval(parse(text = formula))
 }
 
+kn.modelExecRemote <- function(model, seg_nb, innumber) {
+
+  body = list(values=list(AA=innumber))
+  names(body$values) <- as.character(seg_nb)
+
+  M <- kn.getModel(modelname=model, body=body)
+  M$model$result$number
+}
+
+kn.modelExecRemoteDF <- function(model, seg_nb, inDF){
+
+  sapply(1:nrow(inDF), function(x){
+    kn.modelExecRemote(model, seg_nb, list(dividend=inDF[x,"dividend"], divisor=inDF[x,"divisor"]))
+  })
+}
+
 kn.coll2df <- function(coll){
 
   fullcoll <- lapply(coll$keynumbers$dividends, function(x) {
-    data.frame(number=x$number, name=x$name, location=x$location, date=x$date,unit=x$unit)
+    data.frame(dividend=x$number, name=x$name, location=x$location, date=x$date,unit=x$unit)
   })
   fullcoll <- do.call(rbind, fullcoll)
   fullcoll$date <- as.POSIXct(fullcoll$date)
+  fullcoll$divisor <- coll$keynumbers$divisors[[1]]$number
   fullcoll
 }
 

@@ -9,7 +9,7 @@ coll3 <- kn.getCollection("3023")
 coll2df2 <- kn.coll2df(coll2[[1]])
 coll2df3 <- kn.coll2df(coll3[[1]])
 
-kn.modelExec(Sydney)
+kn.modelExecLocal(Sydney)
 
 seg_num = 2
 Models <- kn.modelRep(Sydney, seg_num)
@@ -58,6 +58,10 @@ library(leaflet)
   ) -> m )
 
 seg_num = 3
+kn.modelExecRemote("sydney-water-usuage-1879", seg_nb=seg_num, list(dividend=838625.5, divisor=1))
+
+kn.modelExecRemoteDF("sydney-water-usuage-1879", seg_nb=seg_num, coll2df3)
+
 Models <- kn.modelRep(Sydney, seg_num)
 coll2df3[,"model1879"] <- sapply(1:length(Models), function(x) kn.modelExec(Models[[x]]))
 
