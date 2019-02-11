@@ -12,6 +12,7 @@ coll3df3 <- kn.coll2df(coll3[[1]])
 kn.modelExecLocal(Sydney)
 
 seg_num = 2
+m <- kn.modelExecRemote("sydney-water-usuage-1879")
 m <- kn.modelExecRemote("sydney-water-usuage-1879", seg_nb=seg_num, list(dividend=838625.5, divisor=1))
 M <- kn.modelExecRemoteDF("sydney-water-usuage-1879", seg_nb=seg_num, coll2df2)
 sapply(M, function(x) x$result$number)

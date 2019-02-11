@@ -101,11 +101,13 @@ kn.modelExecLocal <- function(model) {
   eval(parse(text = formula))
 }
 
-kn.modelExecRemote <- function(model, seg_nb, innumber) {
+kn.modelExecRemote <- function(model, seg_nb=NULL, innumber=NULL) {
 
-  body = list(values=list(AA=innumber))
-  names(body$values) <- as.character(seg_nb)
-
+  body <- NULL
+  if(!is.null(innumber)) {
+    body = list(values=list(AA=innumber))
+    names(body$values) <- as.character(seg_nb)
+  }
   M <- kn.getModel(modelname=model, body=body)
 }
 
