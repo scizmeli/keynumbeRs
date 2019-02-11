@@ -107,10 +107,12 @@ kn.modelExecRemote <- function(model, seg_nb, innumber) {
   names(body$values) <- as.character(seg_nb)
 
   M <- kn.getModel(modelname=model, body=body)
-  M$model$result$number
 }
 
 kn.modelExecRemoteDF <- function(model, seg_nb, inDF){
+
+  if (class(inDF) != "data.frame")
+    stop("The argument 'inDF' should be a data.frame")
 
   sapply(1:nrow(inDF), function(x){
     kn.modelExecRemote(model, seg_nb, list(dividend=inDF[x,"dividend"], divisor=inDF[x,"divisor"]))
