@@ -84,14 +84,14 @@ kn.getModel <- function(modelname, body = NULL) {
 
 #Returns a numerical value
 kn.modelExecLocal <- function(model) {
-  formula = model$data$formula
+  formula = model$model$formula
 
   #Append '1' into variable names stored in the formula
   nul <- sapply(1:length(LETTERS), function(x) {
     formula <<- gsub(LETTERS[x], paste0(LETTERS[x],"1"), formula)
   })
 
-  segments = model$data$segments
+  segments = model$model$segments
 
   for (x in 1:length(segments)) {
     out <- as.numeric(segments[[x]]$dividend$number)/as.numeric(segments[[x]]$divisor$number)
